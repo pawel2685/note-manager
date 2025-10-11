@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { parseTags } from '../utils/tagUtils';
 import type { NewNote } from '../types/note';
@@ -19,23 +19,26 @@ export default function AddNoteForm({ onCreate }: Props) {
     e.preventDefault();
     setError(null);
 
-    if (!title.trim()) { setError('Tytuł jest wymagany.'); return; }
-    if (!content.trim()) { setError('Treść jest wymagana.'); return; }
+    if (!title.trim()) {
+      setError('Tytuł jest wymagany.');
+      return;
+    }
+    if (!content.trim()) {
+      setError('Treść jest wymagana.');
+      return;
+    }
 
     const tags = parseTags(tagsInput);
-
     const payload: NewNote = {
       title: title.trim(),
       content: content.trim(),
       tags,
       isFavorite,
-      // attachmentPath: zostawiamy na później
     };
 
     try {
       setSubmitting(true);
       await onCreate(payload);
-      // reset formularza
       setTitle('');
       setContent('');
       setTagsInput('');
@@ -48,81 +51,130 @@ export default function AddNoteForm({ onCreate }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
-      <h2 className="text-2xl font-semibold mb-6 text-slate-100 text-center">Nowa notatka</h2>
+    <div className="h-100 p-3">
+      <div className="card shadow-lg border-0 rounded-4 h-100 mx-3">
+        <div className="card-body p-4 d-flex flex-column">
+          <h2 className="card-title text-center mb-4 display-6 text-primary fw-bold">
+            ✨ Nowa notatka
+          </h2>
 
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          {error}
-        </div>
-      )}
-
-      <div className="mb-6 max-w-xl mx-auto">
-        <label className="block text-sm font-medium mb-2 text-slate-300">Tytuł *</label>
-        <input
-          className="w-full h-12 rounded-xl border border-slate-600 bg-slate-700/50 px-4 text-lg text-slate-100 outline-none focus:ring-2 focus:ring-sky-500/50 shadow-inner shadow-slate-900/30"
-          placeholder="Np. Lista zakupów"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-6 max-w-xl mx-auto">
-        <label className="block text-sm font-medium mb-2 text-slate-300">Treść *</label>
-        <textarea
-          className="w-full min-h-[180px] rounded-xl border border-slate-600 bg-slate-700/50 p-4 text-lg text-slate-100 outline-none focus:ring-2 focus:ring-sky-500/50 shadow-inner shadow-slate-900/30"
-          placeholder="Wpisz treść notatki…"
-          value={content}
-          onChange={e => setContent(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-6 max-w-xl mx-auto">
-        <label className="block text-sm font-medium mb-2 text-slate-300">Tagi (oddzielone przecinkiem lub spacją)</label>
-        <input
-          className="w-full h-12 rounded-xl border border-slate-600 bg-slate-700/50 px-4 text-lg text-slate-100 outline-none focus:ring-2 focus:ring-sky-500/50 shadow-inner shadow-slate-900/30"
-          placeholder="np. praca, pomysł, ważne"
-          value={tagsInput}
-          onChange={e => setTagsInput(e.target.value)}
-        />
-        {/** podgląd chipów */}
-        <div className="mt-3 flex flex-wrap gap-2">
-          {parseTags(tagsInput).map(tag => (
-            <span key={tag} className="rounded-full border border-slate-600 bg-slate-700/50 px-3 py-1 text-sm text-slate-300">
-              #{tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between gap-4 max-w-xl mx-auto">
-        <button
-          type="button"
-          onClick={() => setIsFavorite(!isFavorite)}
-          className={`flex items-center gap-2 rounded-xl px-4 py-3 font-medium border transition-colors ${
-            isFavorite 
-              ? 'border-pink-500/50 text-pink-400 hover:bg-pink-500/10' 
-              : 'border-slate-600 text-slate-400 hover:bg-slate-700/50'
-          }`}
-        >
-          <HeartIcon className={`h-5 w-5 transition-colors ${isFavorite ? 'fill-pink-400' : ''}`} />
-          {isFavorite ? 'Ulubiona' : 'Dodaj do ulubionych'}
-        </button>
-
-        <button
-          type="submit"
-          disabled={submitting}
-          className="flex-1 rounded-xl bg-sky-500 px-6 py-3 font-medium text-white hover:bg-sky-600 transition-colors disabled:opacity-50"
-        >
-          {submitting ? (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-r-transparent"></div>
+          {error && (
+            <div className="alert alert-danger alert-dismissible rounded-3 shadow-sm mb-3 py-2" role="alert">
+              <i className="bi bi-exclamation-triangle-fill me-2"></i>
+              <strong>Błąd:</strong> {error}
             </div>
-          ) : (
-            'Dodaj notatkę'
           )}
-        </button>
+
+          <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
+            <div className="flex-grow-1">
+              <div className="mb-3">
+                <label htmlFor="title" className="form-label fs-5 fw-bold text-primary mb-2">
+                  📝 Tytuł *
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-lg rounded-3 shadow-sm border-2 border-primary"
+                  id="title"
+                  placeholder="Np. Lista zakupów..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  style={{
+                    fontSize: '1.2rem',
+                    padding: '14px 18px'
+                  }}
+                />
+              </div>
+
+              <div className="mb-3 flex-grow-1 d-flex flex-column">
+                <label htmlFor="content" className="form-label fs-5 fw-bold text-primary mb-2">
+                  📄 Treść *
+                </label>
+                <textarea
+                  className="form-control form-control-lg rounded-3 shadow-sm border-2 border-primary flex-grow-1"
+                  id="content"
+                  placeholder="Wpisz treść notatki..."
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  style={{
+                    fontSize: '1.1rem',
+                    padding: '14px 18px',
+                    resize: 'none',
+                    minHeight: '200px'
+                  }}
+                />
+              </div>
+
+              <div className="mb-3">
+                <label htmlFor="tags" className="form-label fs-5 fw-bold text-secondary mb-2">
+                  🏷️ Tagi
+                  <small className="text-muted ms-2">(przecinek)</small>
+                </label>
+                <input
+                  type="text"
+                  className="form-control form-control-lg rounded-3 shadow-sm border-2 border-secondary"
+                  id="tags"
+                  placeholder="praca, pomysł, ważne"
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  style={{
+                    fontSize: '1.1rem',
+                    padding: '12px 16px'
+                  }}
+                />
+                {parseTags(tagsInput).length > 0 && (
+                  <div className="mt-2 d-flex flex-wrap gap-1">
+                    {parseTags(tagsInput).map((tag) => (
+                      <span 
+                        key={tag} 
+                        className="badge bg-primary rounded-pill shadow-sm px-2 py-1"
+                        style={{ fontSize: '0.9rem' }}
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <hr className="my-3" />
+
+            <div className="d-flex justify-content-between align-items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`btn rounded-3 shadow-sm px-3 py-2 fw-bold ${
+                  isFavorite 
+                    ? 'btn-danger' 
+                    : 'btn-outline-danger'
+                }`}
+              >
+                <HeartIcon className={`me-1 ${isFavorite ? 'text-white' : ''}`} style={{ width: '18px', height: '18px' }} />
+                {isFavorite ? 'Ulubiona ❤️' : 'Ulubiona'}
+              </button>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="btn btn-primary btn-lg rounded-3 shadow px-4 py-2 fs-5 fw-bold"
+              >
+                {submitting ? (
+                  <>
+                    <div className="spinner-border spinner-border-sm me-2" role="status">
+                      <span className="visually-hidden">Ładowanie...</span>
+                    </div>
+                    Zapisywanie...
+                  </>
+                ) : (
+                  <>
+                    Dodaj notatkę 📝
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </form>
+    </div>
   );
 }
