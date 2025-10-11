@@ -1,6 +1,6 @@
 import type { Note } from '../types/note';
-import { StarIcon as StarSolid } from '@heroicons/react/24/solid';
-import { StarIcon as StarOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
 type Props = {
@@ -16,61 +16,122 @@ function formatDate(ms: number) {
 
 export default function NotesList({ notes, loading, onDelete, onToggleFav }: Props) {
   if (loading) {
-    return <div className="mt-6 text-center text-slate-600">Ładowanie…</div>;
+    return (
+      <div className="h-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div className="spinner-border text-primary mb-3" role="status">
+            <span className="visually-hidden">Ładowanie...</span>
+          </div>
+          <p className="text-muted fs-5">Ładowanie notatek...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!notes.length) {
     return (
-      <div className="mt-6 text-center text-slate-600">
-        Brak notatek. Dodaj pierwszą powyżej.
+      <div className="h-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <div className="fs-1 text-muted mb-3">📝</div>
+          <h4 className="text-muted mb-2">Brak notatek</h4>
+          <p className="text-muted">Dodaj pierwszą notatkę używając formularza obok</p>
+        </div>
       </div>
     );
   }
 
-    return (
-      <div className="mt-6">
-        <div className="max-h-[70vh] overflow-auto pr-2">
-          <ul className="grid gap-4 sm:grid-cols-2">
-      {notes.map(n => (
-        <li key={n.id} className="rounded-2xl border border-slate-200 bg-white/70 backdrop-blur p-4 shadow">
-          <div className="mb-1 flex items-start justify-between gap-3">
-            <div className="flex-1">
-              <h3 className="font-semibold leading-tight">{n.title}</h3>
-              <p className="text-sm text-slate-700 whitespace-pre-wrap mt-1">{n.content}</p>
-            </div>
+  return (
+    <div className="h-100">
+      <div className="h-100">
+        <h2 className="h4 text-primary fw-bold text-center mb-3">
+          📚 Twoje notatki
+        </h2>
+        
+        <div className="overflow-auto" style={{ height: 'calc(100% - 60px)' }}>
+          <div className="row g-3">
+            {notes.map(n => (
+              <div key={n.id} className="col-12">
+                <div className="card border-0 shadow-sm rounded-4 h-auto">
+                  <div className="card-body p-4">
+                    <div className="d-flex justify-content-between align-items-start mb-3">
+                      <div className="flex-grow-1 me-3">
+                        <h5 className="card-title text-primary fw-bold mb-2 lh-sm">
+                          {n.title}
+                        </h5>
+                        <p className="card-text text-dark lh-base" style={{ 
+                          fontSize: '1rem',
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word'
+                        }}>
+                          {n.content}
+                        </p>
+                      </div>
+                      
+                      <div className="d-flex flex-column gap-2">
+                        <button
+                          type="button"
+                          title={n.isFavorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+                          className={`btn btn-sm rounded-3 shadow-sm ${
+                            n.isFavorite 
+                              ? 'btn-danger' 
+                              : 'btn-outline-danger'
+                          }`}
+                          onClick={() => onToggleFav && onToggleFav(n.id, !n.isFavorite)}
+                        >
+                          {n.isFavorite ? 
+                            <HeartSolid style={{ width: '16px', height: '16px' }} /> : 
+                            <HeartOutline style={{ width: '16px', height: '16px' }} />
+                          }
+                        </button>
+                        
+                        <button
+                          type="button"
+                          title="Usuń notatkę"
+                          className="btn btn-sm btn-outline-danger rounded-3 shadow-sm"
+                          onClick={() => onDelete && onDelete(n.id)}
+                        >
+                          <TrashIcon style={{ width: '16px', height: '16px' }} />
+                        </button>
+                      </div>
+                    </div>
 
-            <div className="flex flex-col items-end gap-2">
-              <button
-                title={n.isFavorite ? 'Usuń z ulubionych' : 'Oznacz jako ulubione'}
-                className="rounded-lg p-2 bg-amber-100 text-amber-800 flex items-center"
-                onClick={() => onToggleFav && onToggleFav(n.id, !n.isFavorite)}
-              >
-                {n.isFavorite ? <StarSolid className="h-4 w-4" /> : <StarOutline className="h-4 w-4" />}
-              </button>
-              <button
-                title="Usuń"
-                className="rounded-lg p-2 bg-red-50 text-red-600 flex items-center"
-                onClick={() => onDelete && onDelete(n.id)}
-              >
-                <TrashIcon className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+                    {n.tags.length > 0 && (
+                      <div className="d-flex flex-wrap gap-1 mb-3">
+                        {n.tags.map(t => (
+                          <span 
+                            key={t} 
+                            className="badge bg-secondary rounded-pill px-2 py-1"
+                            style={{ fontSize: '0.8rem' }}
+                          >
+                            #{t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-          <div className="mt-3 flex flex-wrap gap-2">
-            {n.tags.map(t => (
-              <span key={t} className="rounded-full border px-2 py-0.5 text-xs text-slate-700">#{t}</span>
+                    <div className="border-top pt-2 mt-3">
+                      <div className="row">
+                        <div className="col-6">
+                          <small className="text-muted d-block">
+                            <i className="bi bi-plus-circle me-1"></i>
+                            Utworzono: {formatDate(n.createdAt)}
+                          </small>
+                        </div>
+                        <div className="col-6">
+                          <small className="text-muted d-block">
+                            <i className="bi bi-pencil me-1"></i>
+                            Zmieniono: {formatDate(n.updatedAt)}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             ))}
           </div>
-
-          <div className="mt-3 text-xs text-slate-500">
-            <div>Utworzono: {formatDate(n.createdAt)}</div>
-            <div>Aktualizacja: {formatDate(n.updatedAt)}</div>
-          </div>
-        </li>
-      ))}
-          </ul>
         </div>
       </div>
-    );
+    </div>
+  );
 }
