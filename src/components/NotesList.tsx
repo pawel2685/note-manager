@@ -24,10 +24,12 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
     // Filtrowanie po ulubionych
     const matchesFavorites = showOnlyFavorites ? note.isFavorite : true;
     
-    // Filtrowanie po tekście wyszukiwania
+    // Filtrowanie po tekście wyszukiwania (tytuł, treść i tagi)
+    const searchLower = searchText.toLowerCase();
     const matchesSearch = searchText === '' || 
-      note.title.toLowerCase().includes(searchText.toLowerCase()) ||
-      note.content.toLowerCase().includes(searchText.toLowerCase());
+      note.title.toLowerCase().includes(searchLower) ||
+      note.content.toLowerCase().includes(searchLower) ||
+      (note.tags && note.tags.some(tag => tag.toLowerCase().includes(searchLower)));
     
     return matchesFavorites && matchesSearch;
   });
@@ -83,7 +85,7 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
                 <input
                   type="text"
                   className="form-control form-control-sm border-primary"
-                  placeholder="Szukaj notatek..."
+                  placeholder="Szukaj w tytule, treści, tagach..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   style={{ fontSize: '0.9rem' }}
@@ -134,7 +136,7 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
                 <input
                   type="text"
                   className="form-control form-control-sm border-primary"
-                  placeholder="Szukaj notatek..."
+                  placeholder="Szukaj w tytule, treści, tagach..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   style={{ fontSize: '0.9rem' }}
@@ -184,7 +186,7 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
               <input
                 type="text"
                 className="form-control form-control-sm border-primary"
-                placeholder="Szukaj notatek..."
+                placeholder="Szukaj w tytule, treści, tagach..."
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
                 style={{ fontSize: '0.9rem' }}
