@@ -51,10 +51,10 @@ export default function AddNoteForm({ onCreate }: Props) {
   }
 
   return (
-    <div className="h-100 p-3">
-      <div className="card shadow-lg border-0 rounded-4 h-100 mx-3">
+    <div className="h-100">
+      <div className="card shadow-lg border-0 rounded-4 h-100">
         <div className="card-body p-4 d-flex flex-column">
-          <h2 className="card-title text-center mb-4 display-6 text-primary fw-bold">
+          <h2 className="card-title text-center mb-3 h4 text-primary fw-bold">
             ✨ Nowa notatka
           </h2>
 
