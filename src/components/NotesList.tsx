@@ -2,22 +2,58 @@ import { useState } from 'react';
 import type { Note } from '../types/note';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 type Props = {
   notes: Note[];
   loading?: boolean;
   onDelete?: (id: string) => Promise<void>;
   onToggleFav?: (id: string, fav: boolean) => Promise<void>;
+  onUpdate?: (id: string, data: Partial<Note>) => Promise<void>;
 };
 
 function formatDate(ms: number) {
   return new Date(ms).toLocaleString();
 }
 
-export default function NotesList({ notes, loading, onDelete, onToggleFav }: Props) {
+export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpdate }: Props) {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editContent, setEditContent] = useState('');
+  const [editTags, setEditTags] = useState('');
+
+  const startEditing = (note: Note) => {
+    setEditingNoteId(note.id);
+    setEditTitle(note.title);
+    setEditContent(note.content);
+    setEditTags(note.tags.join(', '));
+  };
+
+  const cancelEditing = () => {
+    setEditingNoteId(null);
+    setEditTitle('');
+    setEditContent('');
+    setEditTags('');
+  };
+
+  const saveEditing = async () => {
+    if (!editingNoteId || !onUpdate) return;
+    
+    const tags = editTags
+      .split(/[,\s]+/)
+      .map(t => t.trim().toLowerCase())
+      .filter(Boolean);
+    
+    await onUpdate(editingNoteId, {
+      title: editTitle.trim(),
+      content: editContent.trim(),
+      tags
+    });
+    
+    cancelEditing();
+  };
   
   // Filtruj notatki na podstawie stanu
   const filteredNotes = notes.filter(note => {
@@ -208,60 +244,132 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
                   }}
                 >
                   <div className="card-body p-4">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <div className="flex-grow-1 me-3">
-                        <h5 className="card-title text-primary fw-bold mb-2 lh-sm">
-                          {n.title}
-                        </h5>
-                        <p className="card-text text-dark lh-base" style={{ 
-                          fontSize: '1rem',
-                          whiteSpace: 'pre-wrap',
-                          wordBreak: 'break-word'
-                        }}>
-                          {n.content}
-                        </p>
-                      </div>
-                      
-                      <div className="d-flex flex-column gap-2">
-                        <button
-                          type="button"
-                          title={n.isFavorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
-                          className={`btn btn-sm rounded-3 shadow-sm ${
-                            n.isFavorite 
-                              ? 'btn-danger' 
-                              : 'btn-outline-danger'
-                          }`}
-                          onClick={() => onToggleFav && onToggleFav(n.id, !n.isFavorite)}
-                        >
-                          {n.isFavorite ? 
-                            <HeartSolid style={{ width: '16px', height: '16px' }} /> : 
-                            <HeartOutline style={{ width: '16px', height: '16px' }} />
-                          }
-                        </button>
-                        
-                        <button
-                          type="button"
-                          title="Usuń notatkę"
-                          className="btn btn-sm btn-outline-danger rounded-3 shadow-sm"
-                          onClick={() => onDelete && onDelete(n.id)}
-                        >
-                          <TrashIcon style={{ width: '16px', height: '16px' }} />
-                        </button>
-                      </div>
-                    </div>
+                    {editingNoteId === n.id ? (
+                      // Tryb edycji
+                      <div>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h6 className="text-primary fw-bold mb-0">✏️ Edycja notatki</h6>
+                          <div className="d-flex gap-2">
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-success"
+                              onClick={saveEditing}
+                              title="Zapisz zmiany"
+                            >
+                              ✓
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-sm btn-secondary"
+                              onClick={cancelEditing}
+                              title="Anuluj"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        </div>
 
-                    {n.tags.length > 0 && (
-                      <div className="d-flex flex-wrap gap-1 mb-3">
-                        {n.tags.map(t => (
-                          <span 
-                            key={t} 
-                            className="badge bg-secondary rounded-pill px-2 py-1"
-                            style={{ fontSize: '0.8rem' }}
-                          >
-                            #{t}
-                          </span>
-                        ))}
+                        <div className="mb-3">
+                          <label className="form-label fw-bold">Tytuł:</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Tytuł notatki..."
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-bold">Treść:</label>
+                          <textarea
+                            className="form-control"
+                            rows={4}
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            placeholder="Treść notatki..."
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-bold">Tagi:</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editTags}
+                            onChange={(e) => setEditTags(e.target.value)}
+                            placeholder="tag1, tag2, tag3..."
+                          />
+                        </div>
                       </div>
+                    ) : (
+                      // Tryb wyświetlania
+                      <>
+                        <div className="d-flex justify-content-between align-items-start mb-3">
+                          <div className="flex-grow-1 me-3">
+                            <h5 className="card-title text-primary fw-bold mb-2 lh-sm">
+                              {n.title}
+                            </h5>
+                            <p className="card-text text-dark lh-base" style={{ 
+                              fontSize: '1rem',
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word'
+                            }}>
+                              {n.content}
+                            </p>
+                          </div>
+                          
+                          <div className="d-flex flex-column gap-2">
+                            <button
+                              type="button"
+                              title={n.isFavorite ? "Usuń z ulubionych" : "Dodaj do ulubionych"}
+                              className={`btn btn-sm rounded-3 shadow-sm ${
+                                n.isFavorite 
+                                  ? 'btn-danger' 
+                                  : 'btn-outline-danger'
+                              }`}
+                              onClick={() => onToggleFav && onToggleFav(n.id, !n.isFavorite)}
+                            >
+                              {n.isFavorite ? 
+                                <HeartSolid style={{ width: '16px', height: '16px' }} /> : 
+                                <HeartOutline style={{ width: '16px', height: '16px' }} />
+                              }
+                            </button>
+                            
+                            <button
+                              type="button"
+                              title="Edytuj notatkę"
+                              className="btn btn-sm btn-outline-primary rounded-3 shadow-sm"
+                              onClick={() => startEditing(n)}
+                            >
+                              <PencilIcon style={{ width: '16px', height: '16px' }} />
+                            </button>
+                            
+                            <button
+                              type="button"
+                              title="Usuń notatkę"
+                              className="btn btn-sm btn-outline-danger rounded-3 shadow-sm"
+                              onClick={() => onDelete && onDelete(n.id)}
+                            >
+                              <TrashIcon style={{ width: '16px', height: '16px' }} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {n.tags.length > 0 && (
+                          <div className="d-flex flex-wrap gap-1 mb-3">
+                            {n.tags.map(t => (
+                              <span 
+                                key={t} 
+                                className="badge bg-secondary rounded-pill px-2 py-1"
+                                style={{ fontSize: '0.8rem' }}
+                              >
+                                #{t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </>
                     )}
 
                     <div className="border-top pt-2 mt-3">

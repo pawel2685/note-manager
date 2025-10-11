@@ -40,6 +40,8 @@ export default function AddNoteForm({ onCreate }: Props) {
     try {
       setSubmitting(true);
       await onCreate(payload);
+      
+      // Resetuj tylko gdy nie edytujemy (onCancelEdit będzie wywoływać App.tsx po zapisaniu)
       setTitle('');
       setContent('');
       setTagsInput('');

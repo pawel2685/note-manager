@@ -3,7 +3,7 @@ import NotesList from './components/NotesList';
 import { useNotes } from './hooks/useNotes';
 
 function App() {
-  const { notes, loading, create, remove, toggleFavorite } = useNotes();
+  const { notes, loading, create, remove, toggleFavorite, update } = useNotes();
 
   return (
     <div 
@@ -68,6 +68,7 @@ function App() {
               loading={loading}
               onDelete={remove}
               onToggleFav={toggleFavorite}
+              onUpdate={update}
             />
           </div>
         </main>
