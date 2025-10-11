@@ -35,5 +35,10 @@ export function useNotes() {
     await reload();
   }, [reload]);
 
-  return { notes, loading, create, remove, toggleFavorite } as const;
+  const update = useCallback(async (id: string, data: NewNote) => {
+    await updateNote(id, data);
+    await reload();
+  }, [reload]);
+
+  return { notes, loading, create, remove, toggleFavorite, update } as const;
 }

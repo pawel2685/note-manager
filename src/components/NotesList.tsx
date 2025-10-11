@@ -2,20 +2,21 @@ import { useState } from 'react';
 import type { Note } from '../types/note';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
-import { TrashIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 type Props = {
   notes: Note[];
   loading?: boolean;
   onDelete?: (id: string) => Promise<void>;
   onToggleFav?: (id: string, fav: boolean) => Promise<void>;
+  onEdit?: (note: Note) => void;
 };
 
 function formatDate(ms: number) {
   return new Date(ms).toLocaleString();
 }
 
-export default function NotesList({ notes, loading, onDelete, onToggleFav }: Props) {
+export default function NotesList({ notes, loading, onDelete, onToggleFav, onEdit }: Props) {
   const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
   const [searchText, setSearchText] = useState('');
   
@@ -237,6 +238,15 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
                             <HeartSolid style={{ width: '16px', height: '16px' }} /> : 
                             <HeartOutline style={{ width: '16px', height: '16px' }} />
                           }
+                        </button>
+                        
+                        <button
+                          type="button"
+                          title="Edytuj notatkę"
+                          className="btn btn-sm btn-outline-primary rounded-3 shadow-sm"
+                          onClick={() => onEdit && onEdit(n)}
+                        >
+                          <PencilIcon style={{ width: '16px', height: '16px' }} />
                         </button>
                         
                         <button

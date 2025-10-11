@@ -1,9 +1,29 @@
+import { useState } from 'react';
 import AddNoteForm from './components/AddNoteForm';
 import NotesList from './components/NotesList';
 import { useNotes } from './hooks/useNotes';
+import type { Note, NewNote } from './types/note';
 
 function App() {
-  const { notes, loading, create, remove, toggleFavorite } = useNotes();
+  const { notes, loading, create, remove, toggleFavorite, update } = useNotes();
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
+
+  const handleEdit = (note: Note) => {
+    setEditingNote(note);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingNote(null);
+  };
+
+  const handleSave = async (data: NewNote) => {
+    if (editingNote) {
+      await update(editingNote.id, data);
+      setEditingNote(null);
+    } else {
+      await create(data);
+    }
+  };
 
   return (
     <div 
@@ -48,7 +68,11 @@ function App() {
               boxSizing: 'border-box'
             }}
           >
-            <AddNoteForm onCreate={create} />
+            <AddNoteForm 
+              onCreate={handleSave} 
+              editingNote={editingNote}
+              onCancelEdit={handleCancelEdit}
+            />
           </div>
 
           <div 
@@ -68,6 +92,7 @@ function App() {
               loading={loading}
               onDelete={remove}
               onToggleFav={toggleFavorite}
+              onEdit={handleEdit}
             />
           </div>
         </main>

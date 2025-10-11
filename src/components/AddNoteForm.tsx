@@ -1,20 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { parseTags } from '../utils/tagUtils';
-import type { NewNote } from '../types/note';
+import type { NewNote, Note } from '../types/note';
 
 type Props = {
   onCreate: (data: NewNote) => Promise<void>;
+  editingNote?: Note | null;
+  onCancelEdit?: () => void;
 };
 
-export default function AddNoteForm({ onCreate }: Props) {
+export default function AddNoteForm({ onCreate, editingNote, onCancelEdit }: Props) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [tagsInput, setTagsInput] = useState('');
   const [isFavorite, setIsFavorite] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isEditing = !!editingNote;
+
+  // Załaduj dane do edycji
+  useEffect(() => {
+    if (editingNote) {
+      setTitle(editingNote.title);
+      setContent(editingNote.content);
+      setTagsInput(editingNote.tags.join(', '));
+      setIsFavorite(editingNote.isFavorite);
+    } else {
+      // Resetuj formularz gdy nie edytujemy
+      setTitle('');
+      setContent('');
+      setTagsInput('');
+      setIsFavorite(false);
+    }
+    setError(null);
+  }, [editingNote]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,10 +61,14 @@ export default function AddNoteForm({ onCreate }: Props) {
     try {
       setSubmitting(true);
       await onCreate(payload);
-      setTitle('');
-      setContent('');
-      setTagsInput('');
-      setIsFavorite(false);
+      
+      // Resetuj tylko gdy nie edytujemy (onCancelEdit będzie wywoływać App.tsx po zapisaniu)
+      if (!isEditing) {
+        setTitle('');
+        setContent('');
+        setTagsInput('');
+        setIsFavorite(false);
+      }
     } catch (err) {
       setError('Nie udało się zapisać notatki.');
     } finally {
@@ -55,9 +80,21 @@ export default function AddNoteForm({ onCreate }: Props) {
     <div className="h-100">
       <div className="h-100 bg-transparent">
         <div className="d-flex flex-column h-100">
-          <h2 className="text-center mb-3 h4 text-primary fw-bold">
-            ✨ Nowa notatka
-          </h2>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h2 className="h4 text-primary fw-bold mb-0">
+              {isEditing ? '✏️ Edytuj notatkę' : '✨ Nowa notatka'}
+            </h2>
+            {isEditing && (
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-secondary"
+                onClick={onCancelEdit}
+                title="Anuluj edycję"
+              >
+                ✕
+              </button>
+            )}
+          </div>
 
           {error && (
             <div className="alert alert-danger alert-dismissible rounded-3 shadow-sm mb-3 py-2" role="alert">
@@ -179,7 +216,7 @@ export default function AddNoteForm({ onCreate }: Props) {
                   </>
                 ) : (
                   <>
-                    Dodaj notatkę 📝
+                    {isEditing ? 'Zapisz zmiany 💾' : 'Dodaj notatkę 📝'}
                   </>
                 )}
               </button>
