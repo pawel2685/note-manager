@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Note } from '../types/note';
 import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartOutline } from '@heroicons/react/24/outline';
@@ -15,6 +16,22 @@ function formatDate(ms: number) {
 }
 
 export default function NotesList({ notes, loading, onDelete, onToggleFav }: Props) {
+  const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  
+  // Filtruj notatki na podstawie stanu
+  const filteredNotes = notes.filter(note => {
+    // Filtrowanie po ulubionych
+    const matchesFavorites = showOnlyFavorites ? note.isFavorite : true;
+    
+    // Filtrowanie po tekście wyszukiwania
+    const matchesSearch = searchText === '' || 
+      note.title.toLowerCase().includes(searchText.toLowerCase()) ||
+      note.content.toLowerCase().includes(searchText.toLowerCase());
+    
+    return matchesFavorites && matchesSearch;
+  });
+
   if (loading) {
     return (
       <div className="h-100 d-flex align-items-center justify-content-center">
@@ -40,6 +57,104 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
     );
   }
 
+  if (showOnlyFavorites && !filteredNotes.length) {
+    return (
+      <div className="h-100">
+        <div className="h-100 bg-transparent">
+          <h2 className="h4 text-primary fw-bold text-center mb-3">
+            📚 Twoje notatki
+          </h2>
+          
+          <div className="text-center mb-3">
+            <div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                className="btn btn-danger btn-sm rounded-3 shadow-sm px-3 py-1 fw-bold"
+              >
+                <HeartSolid className="me-1" style={{ width: '14px', height: '14px' }} />
+                Filtruj ulubione
+              </button>
+              
+              <div className="input-group" style={{ maxWidth: '250px' }}>
+                <span className="input-group-text bg-primary text-white border-primary">
+                  🔍
+                </span>
+                <input
+                  type="text"
+                  className="form-control form-control-sm border-primary"
+                  placeholder="Szukaj notatek..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="d-flex align-items-center justify-content-center h-50">
+            <div className="text-center">
+              <div className="fs-1 text-muted mb-3">💔</div>
+              <h4 className="text-muted mb-2">Brak ulubionych notatek</h4>
+              <p className="text-muted">Oznacz notatki jako ulubione używając serduszka</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (searchText && !filteredNotes.length) {
+    return (
+      <div className="h-100">
+        <div className="h-100 bg-transparent">
+          <h2 className="h4 text-primary fw-bold text-center mb-3">
+            📚 Twoje notatki
+          </h2>
+          
+          <div className="text-center mb-3">
+            <div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                className={`btn btn-sm rounded-3 shadow-sm px-3 py-1 fw-bold ${
+                  showOnlyFavorites 
+                    ? 'btn-danger' 
+                    : 'btn-outline-danger'
+                }`}
+              >
+                <HeartSolid className="me-1" style={{ width: '14px', height: '14px' }} />
+                Filtruj ulubione
+              </button>
+              
+              <div className="input-group" style={{ maxWidth: '250px' }}>
+                <span className="input-group-text bg-primary text-white border-primary">
+                  🔍
+                </span>
+                <input
+                  type="text"
+                  className="form-control form-control-sm border-primary"
+                  placeholder="Szukaj notatek..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  style={{ fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="d-flex align-items-center justify-content-center h-50">
+            <div className="text-center">
+              <div className="fs-1 text-muted mb-3">🔍</div>
+              <h4 className="text-muted mb-2">Brak wyników wyszukiwania</h4>
+              <p className="text-muted">Nie znaleziono notatek zawierających "{searchText}"</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-100">
       <div className="h-100 bg-transparent">
@@ -47,9 +162,40 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
           📚 Twoje notatki
         </h2>
         
-        <div className="overflow-auto" style={{ height: 'calc(100% - 60px)' }}>
+        <div className="text-center mb-3">
+          <div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+              className={`btn btn-sm rounded-3 shadow-sm px-3 py-1 fw-bold ${
+                showOnlyFavorites 
+                  ? 'btn-danger' 
+                  : 'btn-outline-danger'
+              }`}
+            >
+              <HeartSolid className="me-1" style={{ width: '14px', height: '14px' }} />
+              Filtruj ulubione
+            </button>
+            
+            <div className="input-group" style={{ maxWidth: '250px' }}>
+              <span className="input-group-text bg-primary text-white border-primary">
+                🔍
+              </span>
+              <input
+                type="text"
+                className="form-control form-control-sm border-primary"
+                placeholder="Szukaj notatek..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ fontSize: '0.9rem' }}
+              />
+            </div>
+          </div>
+        </div>
+        
+        <div className="overflow-auto" style={{ height: 'calc(100% - 140px)' }}>
           <div className="row g-3" style={{ margin: 0, width: '100%' }}>
-            {notes.map(n => (
+            {filteredNotes.map(n => (
               <div key={n.id} className="col-12" style={{ paddingLeft: '0.75rem', paddingRight: '0.75rem' }}>
                 <div 
                   className="card h-auto bg-white" 
