@@ -236,17 +236,5 @@ npm run build
 - [ ] Docker containerization
 - [ ] Performance monitoring
 
-## 👥 Wkład w projekt
-
-Jeśli chcesz przyczynić się do rozwoju projektu:
-
-1. Forkuj repozytorium
-2. Utwórz branch dla nowej funkcjonalności
-3. Wprowadź zmiany z testami
-4. Wyślij Pull Request
-
-## 📄 Licencja
-
-Ten projekt jest licencjonowany na warunkach [MIT License](LICENSE).
-
+##
 
