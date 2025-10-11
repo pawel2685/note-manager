@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { addNote, getAllNotes } from './db/notesService';
+import type { Note } from './types/note';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      await addNote({
+        title: 'Pierwsza notatka',
+        content: 'To jest testowa notatka',
+        tags: ['test', 'demo'],
+        isFavorite: false,
+      });
+      const all = await getAllNotes();
+      setNotes(all);
+    })();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="p-4">
+      <h1 className="text-xl font-bold mb-2">Notatki:</h1>
+      <ul className="space-y-2">
+        {notes.map(note => (
+          <li key={note.id} className="border rounded p-2">
+            <h2 className="font-semibold">{note.title}</h2>
+            <p>{note.content}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
