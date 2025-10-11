@@ -25,7 +25,7 @@ function App() {
         }}
       >
         <h1 className="text-3xl font-bold mb-4 text-center py-2" style={{ color: '#2563eb' }}>
-          📝 Note Manager
+          📝 Moje Notatki
         </h1>
 
         <main 
