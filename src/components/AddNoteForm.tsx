@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolid } from '@heroicons/react/24/solid';
 import { parseTags } from '../utils/tagUtils';
 import type { NewNote } from '../types/note';
 
@@ -52,9 +53,9 @@ export default function AddNoteForm({ onCreate }: Props) {
 
   return (
     <div className="h-100">
-      <div className="card shadow-lg border-0 rounded-4 h-100">
-        <div className="card-body p-4 d-flex flex-column">
-          <h2 className="card-title text-center mb-3 h4 text-primary fw-bold">
+      <div className="h-100 bg-transparent">
+        <div className="d-flex flex-column h-100">
+          <h2 className="text-center mb-3 h4 text-primary fw-bold">
             ✨ Nowa notatka
           </h2>
 
@@ -99,7 +100,8 @@ export default function AddNoteForm({ onCreate }: Props) {
                     fontSize: '1.1rem',
                     padding: '14px 18px',
                     resize: 'none',
-                    minHeight: '200px'
+                    minHeight: '350px',
+                    height: '350px'
                   }}
                 />
               </div>
@@ -149,8 +151,18 @@ export default function AddNoteForm({ onCreate }: Props) {
                     : 'btn-outline-danger'
                 }`}
               >
-                <HeartIcon className={`me-1 ${isFavorite ? 'text-white' : ''}`} style={{ width: '18px', height: '18px' }} />
-                {isFavorite ? 'Ulubiona ❤️' : 'Ulubiona'}
+                {isFavorite ? (
+                  <HeartSolid 
+                    className="me-1 text-white" 
+                    style={{ width: '18px', height: '18px' }} 
+                  />
+                ) : (
+                  <HeartIcon 
+                    className="me-1 text-danger" 
+                    style={{ width: '18px', height: '18px' }} 
+                  />
+                )}
+                Ulubiona
               </button>
 
               <button
