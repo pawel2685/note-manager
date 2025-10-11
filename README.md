@@ -249,10 +249,4 @@ Jeśli chcesz przyczynić się do rozwoju projektu:
 
 Ten projekt jest licencjonowany na warunkach [MIT License](LICENSE).
 
-## 📞 Kontakt
 
-W przypadku pytań lub problemów, utwórz issue w repozytorium GitHub.
-
----
-
-**Aplikacja została stworzona z myślą o prostocie, wydajności i przyjazności użytkownikowi. Ciesz się zarządzaniem swoimi notatkami!** ✨
