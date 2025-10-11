@@ -42,16 +42,23 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav }: Pro
 
   return (
     <div className="h-100">
-      <div className="h-100">
+      <div className="h-100 bg-transparent">
         <h2 className="h4 text-primary fw-bold text-center mb-3">
           📚 Twoje notatki
         </h2>
         
         <div className="overflow-auto" style={{ height: 'calc(100% - 60px)' }}>
-          <div className="row g-3">
+          <div className="row g-3" style={{ margin: 0, width: '100%' }}>
             {notes.map(n => (
-              <div key={n.id} className="col-12">
-                <div className="card border-0 shadow-sm rounded-4 h-auto">
+              <div key={n.id} className="col-12" style={{ paddingLeft: '0.75rem', paddingRight: '0.75rem' }}>
+                <div 
+                  className="card h-auto bg-white" 
+                  style={{ 
+                    borderRadius: '1rem', 
+                    border: '2px solid #6b7280', 
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)' 
+                  }}
+                >
                   <div className="card-body p-4">
                     <div className="d-flex justify-content-between align-items-start mb-3">
                       <div className="flex-grow-1 me-3">
