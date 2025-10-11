@@ -1,164 +1,258 @@
-# note-manager
+# 📝 Menedżer Notatek
 
-Projekt "note-manager" to mała aplikacja frontendowa napisana w React + TypeScript, zbudowana przy pomocy Vite i Tailwind CSS.
+Aplikacja do zarządzania notatkami napisana w React + TypeScript z lokalna bazą danych. Umożliwia tworzenie, edycję, wyszukiwanie i filtrowanie notatek z intuicyjnym interfejem użytkownika.
 
-## Krótkie podsumowanie
+## 🚀 Funkcjonalności
 
-- Framework: React 19 + TypeScript
-- Bundler / dev server: Vite
-- Stylowanie: Tailwind CSS (v4) + PostCSS + Autoprefixer
-- Linter: ESLint (skrypt `lint` w `package.json` uruchamia `eslint .`)
+### ✨ Główne cechy
+- **Tworzenie notatek** - Dodawanie notatek z tytułem, treścią i tagami
+- **Ulubione notatki** - Oznaczanie notatek jako ulubione (❤️)
+- **Wyszukiwanie** - Filtrowanie notatek po zawartości
+- **Zarządzanie tagami** - Dodawanie etykiet do notatek
+- **Lokalna baza danych** - Dane przechowywane w IndexedDB
+- **Responsywny design** - Dostosowany do różnych rozmiarów ekranów
 
-## Wymagania
+### 📋 Interfejs użytkownika
+- **Dwupanelowy layout** - Formularz dodawania i lista notatek obok siebie
+- **Filtrowanie ulubionych** - Przycisk do wyświetlania tylko ulubionych notatek
+- **Search bar** - Wyszukiwanie w czasie rzeczywistym
+- **Stylizowane karty** - Elegancki wygląd z cieniami i zaokrąglonymi rogami
+- **Gradient background** - Nowoczesne tło z gradientem
 
-- Node.js (zalecane LTS, np. 18+)
-- npm (lub yarn/pnpm) — projekt używa `package.json` i `package-lock.json`
+## 🛠 Technologie
 
-## Uruchomienie lokalne
+### Frontend
+- **React 19** - Najnowsza wersja React z TypeScript
+- **TypeScript** - Statyczne typowanie dla lepszej jakości kodu
+- **Vite** - Szybki bundler i serwer deweloperski
+- **Tailwind CSS** - Utility-first CSS framework
+- **Bootstrap 5** - Komponenty UI i grid system
 
-1. Zainstaluj zależności:
+### Stylowanie
+- **Tailwind CSS v4** - Główny system stylizacji
+- **Bootstrap 5.3.8** - Komponenty formularzy i layoutu
+- **DaisyUI** - Dodatkowe komponenty Tailwind
+- **PostCSS + Autoprefixer** - Przetwarzanie CSS
 
-```powershell
+### Baza danych
+- **Dexie.js** - Wrapper dla IndexedDB
+- **IndexedDB** - Lokalna baza danych w przeglądarce
+- **UUID** - Generowanie unikalnych identyfikatorów
+
+### Ikony
+- **Heroicons** - Piękne ikony SVG od twórców Tailwind
+
+## 📦 Wymagania
+
+- **Node.js** w wersji 18+ (zalecane LTS)
+- **npm** lub **yarn** jako menedżer pakietów
+- Nowoczesna przeglądarka z obsługą ES2020+
+
+## 🚀 Instalacja i uruchomienie
+
+### 1. Sklonuj repozytorium
+```bash
+git clone [adres-repo]
+cd note-manager
+```
+
+### 2. Zainstaluj zależności
+```bash
 npm install
 ```
 
-2. Uruchom środowisko developerskie (hot-reload):
-
-```powershell
+### 3. Uruchom środowisko deweloperskie
+```bash
 npm run dev
 ```
+Aplikacja będzie dostępna pod adresem `http://localhost:5173`
 
-3. Budowanie aplikacji do produkcji:
-
-```powershell
+### 4. Budowanie do produkcji
+```bash
 npm run build
 ```
 
-4. Podgląd zbudowanej wersji (po `build`):
-
-```powershell
+### 5. Podgląd wersji produkcyjnej
+```bash
 npm run preview
 ```
 
-## Dostępne skrypty (z `package.json`)
+## 📚 Dostępne skrypty
 
-- `dev` — uruchamia Vite dev server
-- `build` — uruchamia `tsc -b` (build TypeScript projektów referencyjnych) i `vite build`
-- `lint` — uruchamia ESLint (`eslint .`)
-- `preview` — uruchamia `vite preview` do lokalnego podglądu katalogu `dist`
+| Skrypt | Opis |
+|--------|------|
+| `npm run dev` | Uruchamia serwer deweloperski z hot-reload |
+| `npm run build` | Buduje aplikację do produkcji |
+| `npm run lint` | Uruchamia ESLint do sprawdzania kodu |
+| `npm run preview` | Podgląd zbudowanej wersji |
 
-## Konfiguracja projektu (ważne pliki)
+## 🏗 Struktura projektu
 
-- `index.html` — punkt wejścia; ładuje `/src/main.tsx`
-- `src/main.tsx` — root React + import `index.css`
-- `src/index.css` — zawiera podstawowe reguły CSS i dyrektywy Tailwind:
-  - `@tailwind base;`
-  - `@tailwind components;`
-  - `@tailwind utilities;`
-- `tailwind.config.js` — konfiguracja Tailwind (content wskazuje na `index.html` i `src/**/*`)
-- `postcss.config.js` — używa `tailwindcss` i `autoprefixer`
-- `vite.config.ts` — konfiguracja Vite (plugins: `@vitejs/plugin-react`)
-- `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json` — konfiguracja TypeScript
-
-## Notatki o Tailwind i edytorze
-
-W plikach CSS są używane dyrektywy Tailwind (`@tailwind ...`), które nie są standardowymi at-rule CSS — niektóre edytory lub wtyczki mogą ostrzegać "unknown at rule". W repo dodałem ustawienie VS Code, które to ignoruje (lokalne ustawienia workspace `.vscode/settings.json`). Jeśli wolisz, zamiast tego można skonfigurować stylelint lub zainstalować rozszerzenie VS Code rozumiejące Tailwind.
-
-## Linting
-
-Projekt ma skonfigurowany skrypt `lint` uruchamiający ESLint. Jeśli chcesz dodać sprawdzanie stylów CSS (stylelint) lub reguły specyficzne dla Tailwind, mogę pomóc dodać konfigurację i skrypt `stylelint`.
-
-## Debugowanie / typowe problemy
-
-- Błąd "unknown at rule": to normalne przy dyrektywach Tailwind — zaakceptowano rozwiązanie poprzez ustawienia VS Code w `.vscode/settings.json`.
-- Brak zainstalowanych zależności: uruchom `npm install`.
-- Błędy TypeScript: uruchom `npm run build` (`tsc -b`) aby zobaczyć błędy typów.
-
-## Propozycje usprawnień (opcjonalne)
-
-- Dodać `stylelint` i reguły, aby linter rozpoznawał dyrektywy Tailwind.
-- Dodać testy jednostkowe (Jest / Vitest) oraz skrypt `test`.
-- Dodać konfigurację CI (GitHub Actions) do budowania i lintowania przy PR.
-- Rozszerzyć README o instrukcję deploymentu (np. GitHub Pages / Netlify / Vercel).
-
-## Kontakt / dalsze kroki
-
-Jeżeli chcesz, mogę:
-- dodać `stylelint` i konfigurację dla Tailwind,
-- dodać prosty workflow CI (np. GitHub Actions) z build + lint,
-- rozbudować README o instrukcje deploymentu.
-
-Powiedz, które z tych opcji wolisz — wprowadzę zmiany.
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/           # Komponenty React
+│   ├── AddNoteForm.tsx  # Formularz dodawania notatek
+│   ├── NotesList.tsx    # Lista i filtrowanie notatek
+│   └── Header.tsx       # Nagłówek aplikacji
+├── hooks/               # Custom React hooks
+│   └── useNotes.ts      # Hook do zarządzania notatkami
+├── db/                  # Warstwa bazy danych
+│   ├── notesDB.ts       # Konfiguracja Dexie
+│   └── notesService.ts  # Operacje CRUD
+├── types/               # Definicje TypeScript
+│   └── note.ts          # Typy dla notatek
+├── utils/               # Funkcje pomocnicze
+│   └── tagUtils.ts      # Parsowanie tagów
+├── App.tsx              # Główny komponent aplikacji
+├── main.tsx             # Punkt wejścia React
+└── index.css            # Globalne style CSS
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 💾 Model danych
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Typ `Note`
+```typescript
+interface Note {
+  id: string;              // Unikalny identyfikator
+  title: string;           // Tytuł notatki
+  content: string;         // Treść notatki
+  tags: string[];          // Lista tagów
+  isFavorite: boolean;     // Czy notatka jest ulubiona
+  createdAt: number;       // Data utworzenia (timestamp)
+  updatedAt: number;       // Data ostatniej modyfikacji
+  attachmentPath?: string; // Opcjonalna ścieżka do załącznika
+}
 ```
+
+### Typ `NewNote`
+```typescript
+interface NewNote {
+  title: string;
+  content: string;
+  tags: string[];
+  isFavorite: boolean;
+}
+```
+
+## 🎨 Funkcjonalności UI
+
+### Formularz dodawania notatek
+- **Walidacja** - Sprawdzanie wymaganych pól
+- **Tagi** - Dodawanie przecinkami
+- **Przycisk ulubiona** - Toggle z animacją serduszka
+- **Auto-resize** - Pole treści dostosowuje się do zawartości
+
+### Lista notatek
+- **Filtrowanie ulubionych** - Przycisk z czerwonym tłem gdy aktywny
+- **Wyszukiwanie** - Search bar z ikoną lupki
+- **Kombinowane filtry** - Wyszukiwanie + ulubione jednocześnie
+- **Akcje na notatkach** - Usuwanie i toggle ulubionej
+- **Responsive cards** - Eleganckie karty z metadanymi
+
+### Stany aplikacji
+- **Loading state** - Spinner podczas ładowania
+- **Empty state** - Komunikat gdy brak notatek
+- **No favorites** - Specjalny komunikat dla pustych ulubionych
+- **No search results** - Komunikat gdy brak wyników wyszukiwania
+
+## ⚙️ Konfiguracja
+
+### Pliki konfiguracyjne
+- `tailwind.config.js` - Konfiguracja Tailwind CSS
+- `postcss.config.js` - PostCSS z Tailwind i Autoprefixer
+- `vite.config.ts` - Konfiguracja Vite
+- `tsconfig.json` - Konfiguracja TypeScript
+- `eslint.config.js` - Reguły ESLint
+
+### Ustawienia VS Code
+Projekt zawiera `.vscode/settings.json` z konfiguracją:
+- Ignorowanie ostrzeżeń "unknown at-rule" dla dyrektyw Tailwind
+- Odpowiednie formatowanie kodu
+
+## 🐛 Rozwiązywanie problemów
+
+### Typowe błędy
+
+**"unknown at-rule" w CSS**
+- To normalne dla dyrektyw Tailwind (`@tailwind base;`)
+- Zignorowane w ustawieniach VS Code
+
+**Błędy TypeScript**
+```bash
+npm run build  # Sprawdź błędy kompilacji
+```
+
+**Problemy z zależnościami**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Port zajęty**
+```bash
+# Vite automatycznie znajdzie wolny port
+# lub ustaw konkretny port w vite.config.ts
+```
+
+## 🚀 Deployment
+
+### GitHub Pages
+```bash
+npm run build
+# Upload zawartości dist/ do GitHub Pages
+```
+
+### Netlify
+```bash
+# Build command: npm run build
+# Publish directory: dist
+```
+
+### Vercel
+```bash
+# Framework: Vite
+# Build command: npm run build
+# Output directory: dist
+```
+
+## 🔮 Możliwe rozszerzenia
+
+### Funkcjonalności
+- [ ] Edycja notatek w miejscu
+- [ ] Kategorie notatek
+- [ ] Eksport do plików
+- [ ] Import z innych formatów
+- [ ] Synchronizacja w chmurze
+- [ ] Współdzielenie notatek
+- [ ] Dark/Light mode toggle
+- [ ] Kopia zapasowa danych
+
+### Techniczne
+- [ ] Testy jednostkowe (Vitest)
+- [ ] Testy E2E (Playwright)
+- [ ] PWA (Progressive Web App)
+- [ ] Offline support
+- [ ] CI/CD z GitHub Actions
+- [ ] Docker containerization
+- [ ] Performance monitoring
+
+## 👥 Wkład w projekt
+
+Jeśli chcesz przyczynić się do rozwoju projektu:
+
+1. Forkuj repozytorium
+2. Utwórz branch dla nowej funkcjonalności
+3. Wprowadź zmiany z testami
+4. Wyślij Pull Request
+
+## 📄 Licencja
+
+Ten projekt jest licencjonowany na warunkach [MIT License](LICENSE).
+
+## 📞 Kontakt
+
+W przypadku pytań lub problemów, utwórz issue w repozytorium GitHub.
+
+---
+
+**Aplikacja została stworzona z myślą o prostocie, wydajności i przyjazności użytkownikowi. Ciesz się zarządzaniem swoimi notatkami!** ✨
