@@ -35,7 +35,7 @@ export function useNotes() {
     await reload();
   }, [reload]);
 
-  const update = useCallback(async (id: string, data: NewNote) => {
+  const update = useCallback(async (id: string, data: Partial<Note>) => {
     await updateNote(id, data);
     await reload();
   }, [reload]);
