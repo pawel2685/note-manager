@@ -1,34 +1,31 @@
-import { useEffect, useState } from 'react';
-import { addNote, getAllNotes } from './db/notesService';
-import type { Note } from './types/note';
+import AddNoteForm from './components/AddNoteForm';
+import NotesList from './components/NotesList';
+import Header from './components/Header';
+import { useNotes } from './hooks/useNotes';
 
 function App() {
-  const [notes, setNotes] = useState<Note[]>([]);
-
-  useEffect(() => {
-    (async () => {
-      await addNote({
-        title: 'Pierwsza notatka',
-        content: 'To jest testowa notatka',
-        tags: ['test', 'demo'],
-        isFavorite: false,
-      });
-      const all = await getAllNotes();
-      setNotes(all);
-    })();
-  }, []);
+  const { notes, loading, create, remove, toggleFavorite } = useNotes();
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-2">Notatki:</h1>
-      <ul className="space-y-2">
-        {notes.map(note => (
-          <li key={note.id} className="border rounded p-2">
-            <h2 className="font-semibold">{note.title}</h2>
-            <p>{note.content}</p>
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen bg-slate-900 p-8">
+      <div className="mx-auto max-w-7xl h-[calc(100vh-4rem)]">
+        <h1 className="text-3xl font-bold text-slate-100 mb-8 text-center">Note Manager</h1>
+
+        <main className="flex gap-12 h-full">
+          <div className="w-2/5 border border-slate-700 rounded-xl bg-slate-800/80 p-8 shadow-lg shadow-slate-900/50 backdrop-blur">
+            <AddNoteForm onCreate={create} />
+          </div>
+
+          <div className="w-3/5 border border-slate-700 rounded-xl bg-slate-800/80 p-8 shadow-lg shadow-slate-900/50 backdrop-blur">
+            <NotesList
+              notes={notes}
+              loading={loading}
+              onDelete={remove}
+              onToggleFav={toggleFavorite}
+            />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
