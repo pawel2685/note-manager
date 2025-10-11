@@ -23,12 +23,16 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
   const [editTags, setEditTags] = useState('');
+  const [editFile, setEditFile] = useState<File | null>(null);
+  const [keepExistingAttachment, setKeepExistingAttachment] = useState(true);
 
   const startEditing = (note: Note) => {
     setEditingNoteId(note.id);
     setEditTitle(note.title);
     setEditContent(note.content);
     setEditTags(note.tags.join(', '));
+    setEditFile(null);
+    setKeepExistingAttachment(!!note.attachmentPath);
   };
 
   const cancelEditing = () => {
@@ -36,6 +40,29 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
     setEditTitle('');
     setEditContent('');
     setEditTags('');
+    setEditFile(null);
+    setKeepExistingAttachment(true);
+  };
+
+  const handleEditFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Plik jest za duży. Maksymalny rozmiar to 5MB.');
+        return;
+      }
+      setEditFile(file);
+      setKeepExistingAttachment(false);
+    }
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
   };
 
   const saveEditing = async () => {
@@ -46,10 +73,28 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
       .map(t => t.trim().toLowerCase())
       .filter(Boolean);
     
+    let attachmentPath: string | undefined;
+    
+    if (editFile) {
+      // Nowy plik został wybrany
+      try {
+        attachmentPath = await convertFileToBase64(editFile);
+      } catch (err) {
+        alert('Nie udało się przetworzyć załącznika.');
+        return;
+      }
+    } else if (keepExistingAttachment) {
+      // Zachowaj istniejący załącznik
+      const currentNote = notes.find(n => n.id === editingNoteId);
+      attachmentPath = currentNote?.attachmentPath;
+    }
+    // Jeśli ani editFile ani keepExistingAttachment, to attachmentPath zostanie undefined (usunięcie załącznika)
+    
     await onUpdate(editingNoteId, {
       title: editTitle.trim(),
       content: editContent.trim(),
-      tags
+      tags,
+      attachmentPath
     });
     
     cancelEditing();
@@ -194,13 +239,29 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
   }
 
   return (
-    <div className="h-100">
-      <div className="h-100 bg-transparent">
-        <h2 className="h4 text-primary fw-bold text-center mb-3">
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ 
+        height: '100%', 
+        display: 'flex', 
+        flexDirection: 'column',
+        minHeight: 0
+      }}>
+        <h2 style={{ 
+          fontSize: '1.25rem',
+          color: '#2563eb',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          margin: '0 0 1rem 0',
+          flexShrink: 0
+        }}>
           📚 Twoje notatki
         </h2>
         
-        <div className="text-center mb-3">
+        <div style={{ 
+          textAlign: 'center', 
+          marginBottom: '1rem',
+          flexShrink: 0
+        }}>
           <div className="d-flex justify-content-center align-items-center gap-3 flex-wrap">
             <button
               type="button"
@@ -231,8 +292,13 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
           </div>
         </div>
         
-        <div className="overflow-auto" style={{ height: 'calc(100% - 140px)' }}>
-          <div className="row g-3" style={{ margin: 0, width: '100%' }}>
+        <div style={{ 
+          height: '100%',
+          minHeight: 0,
+          overflow: 'auto',
+          paddingRight: '0.5rem'
+        }}>
+          <div className="row g-3" style={{ margin: 0, width: '100%', paddingBottom: '2rem' }}>
             {filteredNotes.map(n => (
               <div key={n.id} className="col-12" style={{ paddingLeft: '0.75rem', paddingRight: '0.75rem' }}>
                 <div 
@@ -301,6 +367,64 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
                             placeholder="tag1, tag2, tag3..."
                           />
                         </div>
+
+                        <div className="mb-3">
+                          <label className="form-label fw-bold">Załącznik:</label>
+                          
+                          {/* Istniejący załącznik */}
+                          {n.attachmentPath && keepExistingAttachment && !editFile && (
+                            <div className="alert alert-info py-2 px-3 mb-2">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <small className="fw-bold">Obecny załącznik:</small><br />
+                                  <span className="text-primary">📎 Załącznik</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => setKeepExistingAttachment(false)}
+                                  title="Usuń załącznik"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Nowy plik */}
+                          <input
+                            type="file"
+                            className="form-control"
+                            onChange={handleEditFileChange}
+                            accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+                          />
+                          <div className="form-text text-muted">
+                            Maksymalny rozmiar: 5MB
+                          </div>
+                          
+                          {editFile && (
+                            <div className="mt-2 alert alert-success py-2 px-3">
+                              <div className="d-flex justify-content-between align-items-center">
+                                <div>
+                                  <small className="fw-bold">Nowy plik:</small><br />
+                                  <span className="text-primary">{editFile.name}</span>
+                                  <small className="text-muted ms-2">({(editFile.size / 1024).toFixed(1)} KB)</small>
+                                </div>
+                                <button
+                                  type="button"
+                                  className="btn btn-sm btn-outline-danger"
+                                  onClick={() => {
+                                    setEditFile(null);
+                                    setKeepExistingAttachment(!!n.attachmentPath);
+                                  }}
+                                  title="Usuń nowy plik"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       // Tryb wyświetlania
@@ -367,6 +491,59 @@ export default function NotesList({ notes, loading, onDelete, onToggleFav, onUpd
                                 #{t}
                               </span>
                             ))}
+                          </div>
+                        )}
+
+                        {/* Wyświetlanie załącznika */}
+                        {n.attachmentPath && (
+                          <div className="mb-3">
+                            <div className="card bg-light border-0">
+                              <div className="card-body p-3">
+                                <div className="d-flex align-items-center justify-content-between">
+                                  <div className="d-flex align-items-center">
+                                    <span className="fs-4 me-2">📎</span>
+                                    <div>
+                                      <span className="fw-bold text-primary">Załącznik</span>
+                                      <br />
+                                      <small className="text-muted">Kliknij aby pobrać</small>
+                                    </div>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-primary"
+                                    onClick={() => {
+                                      // Pobierz załącznik
+                                      const link = document.createElement('a');
+                                      link.href = n.attachmentPath!;
+                                      link.download = `attachment_${n.title}_${Date.now()}`;
+                                      document.body.appendChild(link);
+                                      link.click();
+                                      document.body.removeChild(link);
+                                    }}
+                                    title="Pobierz załącznik"
+                                  >
+                                    ⬇️ Pobierz
+                                  </button>
+                                </div>
+                                
+                                {/* Podgląd obrazu jeśli to obraz */}
+                                {n.attachmentPath.startsWith('data:image/') && (
+                                  <div className="mt-3">
+                                    <img 
+                                      src={n.attachmentPath} 
+                                      alt="Podgląd załącznika" 
+                                      className="img-fluid rounded"
+                                      style={{ 
+                                        maxHeight: '150px', 
+                                        maxWidth: '100%',
+                                        width: 'auto',
+                                        objectFit: 'contain'
+                                      }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         )}
                       </>

@@ -15,6 +15,29 @@ export default function AddNoteForm({ onCreate }: Props) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Ograniczenie rozmiaru do 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Plik jest za duży. Maksymalny rozmiar to 5MB.');
+        return;
+      }
+      setSelectedFile(file);
+      setError(null);
+    }
+  };
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,11 +53,24 @@ export default function AddNoteForm({ onCreate }: Props) {
     }
 
     const tags = parseTags(tagsInput);
+    
+    let attachmentPath: string | undefined;
+    if (selectedFile) {
+      try {
+        attachmentPath = await convertFileToBase64(selectedFile);
+      } catch (err) {
+        setError('Nie udało się przetworzyć załącznika.');
+        setSubmitting(false);
+        return;
+      }
+    }
+    
     const payload: NewNote = {
       title: title.trim(),
       content: content.trim(),
       tags,
       isFavorite,
+      attachmentPath,
     };
 
     try {
@@ -46,6 +82,7 @@ export default function AddNoteForm({ onCreate }: Props) {
       setContent('');
       setTagsInput('');
       setIsFavorite(false);
+      setSelectedFile(null);
     } catch (err) {
       setError('Nie udało się zapisać notatki.');
     } finally {
@@ -68,8 +105,13 @@ export default function AddNoteForm({ onCreate }: Props) {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column">
-            <div className="flex-grow-1">
+          <form onSubmit={handleSubmit} className="flex-grow-1 d-flex flex-column" style={{ minHeight: 0, height: '100%' }}>
+            <div className="flex-grow-1 overflow-auto pe-2" style={{ 
+              maxHeight: '100%',
+              overflowY: 'auto',
+              scrollbarWidth: 'thin',
+              flex: '1 1 0'
+            }}>
               <div className="mb-3">
                 <label htmlFor="title" className="form-label fs-5 fw-bold text-primary mb-2">
                   📝 Tytuł *
@@ -98,12 +140,13 @@ export default function AddNoteForm({ onCreate }: Props) {
                   placeholder="Wpisz treść notatki..."
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
+                  rows={4}
                   style={{
                     fontSize: '1.1rem',
                     padding: '14px 18px',
-                    resize: 'none',
-                    minHeight: '350px',
-                    height: '350px'
+                    resize: 'vertical',
+                    minHeight: '120px',
+                    maxHeight: '200px'
                   }}
                 />
               </div>
@@ -141,9 +184,48 @@ export default function AddNoteForm({ onCreate }: Props) {
               </div>
             </div>
 
-            <hr className="my-3" />
+            {/* Pole załącznika */}
+            <div className="row mb-3">
+              <div className="col-12">
+                <label htmlFor="attachment" className="form-label fs-5 fw-bold text-secondary mb-2">
+                  📎 Załącznik
+                </label>
+                <input
+                  type="file"
+                  id="attachment"
+                  className="form-control form-control-lg rounded-3 border-2 shadow-sm"
+                  onChange={handleFileChange}
+                  accept="image/*,.pdf,.doc,.docx,.txt,.zip,.rar"
+                  style={{ fontSize: '1rem' }}
+                />
+                <div className="form-text text-muted">
+                  Maksymalny rozmiar: 5MB. Obsługiwane formaty: obrazy, PDF, dokumenty, archiwakrze
+                </div>
+                {selectedFile && (
+                  <div className="mt-2">
+                    <div className="alert alert-info py-2 px-3 rounded-3 d-flex align-items-center justify-content-between">
+                      <div>
+                        <small className="fw-bold">Wybrany plik:</small><br />
+                        <span className="text-primary">{selectedFile.name}</span>
+                        <small className="text-muted ms-2">({(selectedFile.size / 1024).toFixed(1)} KB)</small>
+                      </div>
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => setSelectedFile(null)}
+                        title="Usuń załącznik"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
 
-            <div className="d-flex justify-content-between align-items-center gap-2">
+            <hr className="my-3" style={{ margin: '1rem 0', flexShrink: 0 }} />
+
+            <div className="d-flex justify-content-between align-items-center gap-2" style={{ flexShrink: 0 }}>
               <button
                 type="button"
                 onClick={() => setIsFavorite(!isFavorite)}
