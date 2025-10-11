@@ -1,6 +1,5 @@
 import AddNoteForm from './components/AddNoteForm';
 import NotesList from './components/NotesList';
-import Header from './components/Header';
 import { useNotes } from './hooks/useNotes';
 
 function App() {
